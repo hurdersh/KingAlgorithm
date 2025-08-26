@@ -49,7 +49,7 @@ Each phase consists of **two rounds**:
 3. Enter the project directory:
 
    ```bash
-   cd KingAlgorithm/kingalgorithm
+   cd KingAlgorithm/kingalgorithm/kingalgorithm
    ```
 4. Start the project with:
 
@@ -67,7 +67,7 @@ Each phase consists of **two rounds**:
 
 ## Usage
 
-Inside the directory `KingAlgorithm/kingalgorithm/mas/types`, you will find the following agent definitions:
+Inside the directory `KingAlgorithm/kingalgorithm/kingalgorithm/mas/types`, you will find the following agent definitions:
 
 * **agentHonest.txt** → an agent that follows the King Algorithm.
 * **agentRoundSimulator.txt** → a simulator agent used to coordinate and simulate rounds.
