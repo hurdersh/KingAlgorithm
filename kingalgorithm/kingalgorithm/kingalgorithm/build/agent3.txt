@@ -1,0 +1,21 @@
+initializeE:>
+    messageA(agent1,send_message(initialize(1,1,1), Me)),
+    messageA(agent2,send_message(initialize(2,2,2), Me)),
+    messageA(ALL, send_message(show_preferred, Me)),
+    write('Each Agent is initialized').
+
+firstbroadcastE:>
+    messageA(ALL, send_message(start_consensus, Me)).
+
+firstupdatemajorityE:>
+    messageA(ALL, send_message(update_majority, Me)).
+
+kingbroadcastE:>
+    messageA(ALL, send_message(king_broadcast, Me)).
+
+nextroundE:>
+    messageA(ALL, send_message(show_preferred, Me)),
+    messageA(ALL, send_message(nextround, Me)).
+
+    
+    

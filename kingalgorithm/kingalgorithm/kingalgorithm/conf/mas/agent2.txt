@@ -1,0 +1,1 @@
+agent('/home/hurdersh/DALI/DALI/Examples/advanced/work/agent2','agent2','no',italian,['/home/hurdersh/DALI/DALI/Examples/advanced/conf/communication'],['/home/hurdersh/DALI/DALI/src/communication_fipa','/home/hurdersh/DALI/DALI/src/learning','/home/hurdersh/DALI/DALI/src/planasp'],'no','/home/hurdersh/DALI/DALI/src/onto/dali_onto.txt',[]).

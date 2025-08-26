@@ -1,0 +1,152 @@
+:- dynamic agent_id/1.
+:- dynamic total_agents/1.
+:- dynamic round/1.
+:- dynamic preferred_value/1.
+:- dynamic max_rounds/1.
+:- dynamic received_votes/1.
+:- dynamic tally/1.
+
+round(1).
+
+initializeE(ID, N, Preferred):>
+    retractall(received_votes(_)), assert(received_votes([])),
+    retractall(agent_id(_)),
+    assert(agent_id(ID)),
+    retractall(total_agents(_)),
+    assert(total_agents(N)),
+    retractall(preferred_value(_)),
+    assert(preferred_value(Preferred)),
+    R is N // 4 + 1, 
+    retractall(max_rounds(_)),
+    assert(max_rounds(R)).
+
+show_preferredE:>
+    preferred_value(Value),
+    write('Preferred value is: '),
+    write(Value),
+    nl.
+
+show_idE:>
+    agent_id(ID),
+    write('the ID VALUE IS: '),
+    write(ID),
+    nl.
+
+show_roundE:>
+    round(R),
+    write('the Round VALUE IS: '),
+    write(R),
+    nl.
+
+show_tallyE:>
+    tally(Tally),
+    write('the tally VALUE IS: '),
+    write(Tally),
+    nl.
+
+show_votesA:> 
+    received_votes(Votes),
+    write('Received Votes: '),
+    print_list(Votes).
+
+
+
+start_consensusE:>
+    send_voteA.
+
+send_voteA:< round(R),max_rounds(MR), R =< MR.
+
+send_voteA:> 
+    agent_id(ID), total_agents(N), preferred_value(Preferred),
+    messageA(ALL,send_message(vote(ID,Preferred),Me)).
+
+voteE(SenderID, Preferred):>
+     received_votes(Votes),
+     retractall(received_votes(_)),
+     assert(received_votes([(SenderID,Preferred)|Votes])).
+
+update_majorityE:>
+    received_votes(Votes),
+    show_votesA,
+    Votes \= [],
+    majority(Votes, NewValue, Tally),
+    write('New Majority value: '),
+    write(NewValue),
+    retractall(preferred_value(_)), assert(preferred_value(NewValue)),
+    retractall(received_votes(_)), assert(received_votes([])).
+
+king_broadcastE:>
+    king_broadcast_action,
+    king_broadcast_actionA.
+
+king_broadcast_action :-  round(R), agent_id(ID), ID =:= R.
+king_broadcast_actionA:> agent_id(ID), preferred_value(Preferred),
+     write('I am the king'), messageA(ALL,send_message(king_vote(ID,Preferred),Me)).
+
+
+king_voteE(KID, KingValue):>
+    king_vote_precondition,
+    write('updating from king: '),
+    king_vote_updateA(KingValue).
+
+king_vote_precondition :- total_agents(N), round(R), agent_id(ID), R =\= ID, 
+tally(Tally), Limit is N/2 + N/4 + 1, write(Limit), write(Tally), Tally < Limit.
+
+king_vote_updateA(KingValue):>
+    retractall(preferred_value(_)),
+    write("King Value is "),
+    write(KingValue),
+    assert(preferred_value(KingValue)).
+
+nextroundE:>
+    retractall(received_votes(_)), assert(received_votes([])), round(R),
+    NEWR is R + 1,
+    retractall(tally(_)),
+    assert(tally(1)),
+    retractall(round(_)),
+    assert(round(NEWR)).
+
+    
+majority(Votes, Majority, Tally) :-
+    votes_values(Votes, Values),
+    Values \= [],                        
+    tally_counts(Values, Counts),        
+    argmax_by_count(Counts, Majority, Tally0),
+    Tally = Tally0,
+    retractall(tally(_)),
+    assert(tally(Tally)).
+
+votes_values([], []).
+votes_values([(_,V)|T], [V|Vs]) :-      
+    !, votes_values(T, Vs).
+votes_values([vote(_,V)|T], [V|Vs]) :-  
+    !, votes_values(T, Vs).
+votes_values([V|T], [V|Vs]) :-          
+    votes_values(T, Vs).
+
+tally_counts([], []).
+tally_counts([V|Vs], CountsOut) :-
+    tally_counts(Vs, Counts0),
+    inc_count(V, Counts0, CountsOut).
+
+inc_count(V, [], [(V,1)]) :- !.
+inc_count(V, [(V,C)|Rest], [(V,C1)|Rest]) :- !,
+    C1 is C + 1.
+inc_count(V, [P|Rest], [P|Rest1]) :-
+    P = (W,_), W \= V,
+    inc_count(V, Rest, Rest1).
+
+argmax_by_count([(V,C)|Rest], BestV, BestC) :-
+    argmax_by_count(Rest, V, C, BestV, BestC).
+
+argmax_by_count([], CurV, CurC, CurV, CurC).
+argmax_by_count([(V,C)|Rest], CurV, CurC, BestV, BestC) :-
+    ( C > CurC -> NewV = V, NewC = C
+    ;             NewV = CurV, NewC = CurC ),
+    argmax_by_count(Rest, NewV, NewC, BestV, BestC).
+
+
+print_list([]).
+print_list([H|T]) :-
+    write(H), nl,    
+    print_list(T).
