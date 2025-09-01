@@ -44,7 +44,7 @@ Each phase consists of **two rounds**:
 2. Clone this repository:
 
    ```bash
-   git clone https://github.com/hurdersh/KingAlgorithm.git
+   git clone --recurse-submodules https://github.com/hurdersh/KingAlgorithm.git
    ```
 3. Enter the project directory:
 
