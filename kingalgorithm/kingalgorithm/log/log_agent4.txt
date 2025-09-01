@@ -1,3 +1,0 @@
-send_message(send_message(initialize(1,1,1),_33133))
-send_message(send_message(initialize(2,2,2),_38731))
-send_message(send_message(initialize(3,3,3),_38699))
